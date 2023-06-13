@@ -1,0 +1,6 @@
+{
+  "eslint.workingDirectories": ["./functions"],
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "eslint.format.enable": true
+}
