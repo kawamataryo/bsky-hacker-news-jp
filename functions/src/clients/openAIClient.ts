@@ -15,23 +15,11 @@ export class OpenAIClient {
   }
 
   async summarize(url: string) {
-    const loader = new PuppeteerWebBaseLoader(url, {
-      launchOptions: {
-        headless: true,
-      },
-      gotoOptions: {
-        waitUntil: "domcontentloaded",
-      },
-      async evaluate(page: any) {
-        const result = await page.evaluate(() => document.body.innerText);
-        return result;
-      },
-    });
-    const docs = await loader.load();
+    const docs = await this.getWebpageTextDocs(url);
+    const summarizationChain = loadSummarizationChain(this.model, { type: "map_reduce" });
 
-    const chain = loadSummarizationChain(this.model, { type: "map_reduce" });
     try {
-      const res = await chain.call({
+      const res = await summarizationChain.call({
         input_documents: docs,
       });
       return res.text;
@@ -39,5 +27,29 @@ export class OpenAIClient {
       console.error(e);
       return "";
     }
+  }
+
+  private async getWebpageTextDocs(url: string) {
+    const loader = new PuppeteerWebBaseLoader(url, {
+      launchOptions: {
+        headless: true,
+      },
+      gotoOptions: {
+        waitUntil: "domcontentloaded",
+      },
+      async evaluate(page) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const result = await page.evaluate(async () => {
+          const main = document.querySelector("main");
+          if (main) {
+            return main.innerText;
+          } else {
+            return document.body.innerText;
+          }
+        });
+        return result;
+      },
+    });
+    return await loader.load();
   }
 }
