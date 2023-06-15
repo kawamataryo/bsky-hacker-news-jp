@@ -6,7 +6,7 @@ export const getTranslatedSummaryFromUrl = async (url: string): Promise<string> 
   const openAIClient = new OpenAIClient(functions.config().openai.api_key);
   const summary = await Promise.race([
     openAIClient.summarize(url),
-    timeoutPromise(10000),
+    timeoutPromise(200000),
   ]);
   if (summary && summary.length > 10) {
     const translatedSummary = await openAIClient.complete(`

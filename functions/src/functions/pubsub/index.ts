@@ -5,7 +5,7 @@ import { getTargetStory } from "../../services/hackerNewsService";
 import { getTranslatedSummaryFromUrl } from "../../services/openAIService";
 
 const runtimeOpts = {
-  timeoutSeconds: 180,
+  timeoutSeconds: 240,
   memory: "1GB" as const,
 };
 
