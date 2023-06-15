@@ -38,8 +38,8 @@ export class OpenAIClient {
         waitUntil: "domcontentloaded",
       },
       async evaluate(page) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
         const result = await page.evaluate(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
           const main = document.querySelector("main");
           if (main) {
             return main.innerText;
