@@ -6,8 +6,10 @@ export const getTranslatedSummaryFromUrl = async (url: string): Promise<string> 
   const summary = await openAIClient.summarize(url);
   if (summary && summary.length > 10) {
     const translatedSummary = await openAIClient.complete(`
-translate from English to Japanese:
+You are a professional translator. Please translate the following English text into Japanese within 300 characters.
+
 ${summary}
+
 response:
     `.trim());
     return translatedSummary;
