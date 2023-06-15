@@ -98,7 +98,7 @@ export const postSummaryOnThread = async (summary: string, postRef: ComAtprotoRe
     password: functions.config().bsky.password,
   });
   agent.post({
-    text: truncateText(`💡 Summary: \n\n${summary}`, 300),
+    text: truncateText(`💡 Summary: \n\n${summary}`, 296),
     reply: {
       root: postRef,
       parent: postRef,

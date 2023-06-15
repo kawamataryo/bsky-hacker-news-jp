@@ -6,7 +6,7 @@ import { getTranslatedSummaryFromUrl } from "../../services/openAIService";
 
 const runtimeOpts = {
   timeoutSeconds: 180,
-  memory: "512MB" as const,
+  memory: "1GB" as const,
 };
 
 export const post = functions
