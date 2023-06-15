@@ -6,10 +6,16 @@ export class FirestoreClient {
     this.db = admin.firestore();
     this.postedStoriesCollectionRef = this.db.collection("v1").doc("postedStories").collection("stories");
   }
-  async insertPostedStory(story: HackerNewsItemWithTranslated & { summary: string }): Promise<void> {
+  async insertPostedStory(story: HackerNewsItemWithTranslated): Promise<void> {
     await this.postedStoriesCollectionRef.doc(story.id.toString()).set({
       ...story,
       createdAt: new Date().toISOString(),
+    });
+  }
+
+  async updatePostedStory(id: number, summary: string): Promise<void> {
+    await this.postedStoriesCollectionRef.doc(id.toString()).update({
+      summary,
     });
   }
 

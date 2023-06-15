@@ -15,6 +15,11 @@ export const postTrend = functions
   .onRun(async () => {
     const targetStory = await getTargetStory();
     const result = await postNews(targetStory);
+
+    const firestoreClient = new FirestoreClient();
+    await firestoreClient.insertPostedStory(
+      targetStory,
+    );
     let summary = "";
     try {
       summary = await getTranslatedSummaryFromUrl(targetStory.url!);
@@ -22,12 +27,8 @@ export const postTrend = functions
         cid: result.cid,
         uri: result.uri,
       });
+      await firestoreClient.updatePostedStory(targetStory.id, summary);
     } catch (e) {
       console.error(e);
-    } finally {
-      await new FirestoreClient().insertPostedStory({
-        ...targetStory,
-        summary,
-      });
     }
   });
