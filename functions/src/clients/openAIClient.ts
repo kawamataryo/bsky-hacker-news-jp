@@ -7,7 +7,7 @@ export class OpenAIClient {
   private model: OpenAI;
 
   constructor(openAIApiKey: string) {
-    this.model = new OpenAI({ openAIApiKey, temperature: 0.5, modelName: "gpt-3.5-turbo-16k" });
+    this.model = new OpenAI({ openAIApiKey, temperature: 0.5, modelName: "gpt-3.5-turbo" });
   }
 
   async complete(prompt: string) {
