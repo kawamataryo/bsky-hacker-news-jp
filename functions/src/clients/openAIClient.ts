@@ -1,7 +1,6 @@
 import { OpenAI } from "langchain/llms/openai";
 import { loadSummarizationChain } from "langchain/chains";
 import { PuppeteerWebBaseLoader } from "langchain/document_loaders/web/puppeteer";
-import { PromptTemplate } from "langchain/prompts";
 
 export class OpenAIClient {
   private model: OpenAI;
@@ -15,13 +14,7 @@ export class OpenAIClient {
   }
 
   async summarize(url: string) {
-    const prompt = new PromptTemplate({
-      template: "以下の文章を要約してください。\n\n---\n{text}---\n\n要約:",
-      inputVariables: ["text"],
-    });
     const summarizationChain = loadSummarizationChain(this.model, {
-      combineMapPrompt: prompt,
-      combinePrompt: prompt,
       type: "map_reduce",
     });
     const docs = await this.getWebpageTextDocs(url);
@@ -30,6 +23,7 @@ export class OpenAIClient {
       const res = await summarizationChain.call({
         input_documents: docs,
       });
+      console.info("🚀 ~ summarize result", res.text);
       return res.text;
     } catch (e) {
       console.error(e);
@@ -40,7 +34,7 @@ export class OpenAIClient {
   private async getWebpageTextDocs(url: string) {
     const loader = new PuppeteerWebBaseLoader(url, {
       launchOptions: {
-        headless: true,
+        headless: "new",
         args: ["--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"],
       },
       gotoOptions: {
