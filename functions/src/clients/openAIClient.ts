@@ -2,12 +2,11 @@ import { OpenAI } from "langchain/llms/openai";
 import { loadSummarizationChain } from "langchain/chains";
 import { PuppeteerWebBaseLoader } from "langchain/document_loaders/web/puppeteer";
 
-
 export class OpenAIClient {
   private model: OpenAI;
 
   constructor(openAIApiKey: string) {
-    this.model = new OpenAI({ openAIApiKey, temperature: 0.5, modelName: "gpt-3.5-turbo" });
+    this.model = new OpenAI({ openAIApiKey, temperature: 0, modelName: "gpt-3.5-turbo" });
   }
 
   async complete(prompt: string) {
@@ -51,6 +50,6 @@ export class OpenAIClient {
         return result;
       },
     });
-    return await loader.load();
+    return await loader.loadAndSplit();
   }
 }
