@@ -11,7 +11,7 @@ const runtimeOpts = {
 
 export const postTrend = functions
   .runWith(runtimeOpts)
-  .pubsub.schedule("every 2 hours")
+  .pubsub.schedule("every 1 hours")
   .onRun(async () => {
     const targetStory = await getTargetStory();
     const result = await postNews(targetStory);

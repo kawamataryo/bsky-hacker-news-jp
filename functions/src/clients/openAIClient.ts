@@ -1,6 +1,7 @@
 import { OpenAI } from "langchain/llms/openai";
 import { loadSummarizationChain } from "langchain/chains";
 import { PuppeteerWebBaseLoader } from "langchain/document_loaders/web/puppeteer";
+import { PromptTemplate } from "langchain/prompts";
 
 export class OpenAIClient {
   private model: OpenAI;
@@ -14,8 +15,16 @@ export class OpenAIClient {
   }
 
   async summarize(url: string) {
+    const prompt = new PromptTemplate({
+      template: "以下の文章を要約してください。\n\n---\n{text}---\n\n要約:",
+      inputVariables: ["text"],
+    });
+    const summarizationChain = loadSummarizationChain(this.model, {
+      combineMapPrompt: prompt,
+      combinePrompt: prompt,
+      type: "map_reduce",
+    });
     const docs = await this.getWebpageTextDocs(url);
-    const summarizationChain = loadSummarizationChain(this.model, { type: "map_reduce" });
 
     try {
       const res = await summarizationChain.call({
@@ -39,13 +48,19 @@ export class OpenAIClient {
       },
       async evaluate(page) {
         const result = await page.evaluate(async () => {
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          const main = document.querySelector("main");
-          if (main) {
-            return main.innerText;
-          } else {
-            return document.body.innerText;
-          }
+          // wait page load
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          // remove unnecessary elements
+          const scripts = document.body.querySelectorAll("script");
+          const noscript = document.body.querySelectorAll("noscript");
+          const styles = document.body.querySelectorAll("style");
+          const scriptAndStyle = [...scripts, ...noscript, ...styles];
+          scriptAndStyle.forEach((e) => e.remove());
+
+          // collect text
+          const mainElement = document.querySelector("main");
+          return mainElement ? mainElement.innerText : document.body.innerText;
         });
         return result;
       },
