@@ -54,7 +54,8 @@ export class OpenAIClient {
 
           // collect text
           const mainElement = document.querySelector("main");
-          return mainElement ? mainElement.innerText : document.body.innerText;
+          const text = mainElement ? mainElement.innerText : document.body.innerText;
+          return text.slice(0, 20000);
         });
         return result;
       },
