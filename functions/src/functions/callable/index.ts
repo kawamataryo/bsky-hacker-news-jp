@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import { getTargetStory } from "../../services/hackerNewsService";
-import { postNews, postSummaryOnThread } from "../../services/bskyService";
+import { postNews, replyToPostPerText } from "../../services/bskyService";
 import { FirestoreClient } from "../../clients/firestoreClient";
 import { getTranslatedSummaryFromUrl } from "../../services/openAIService";
 
@@ -19,10 +19,9 @@ export const post = functions
     await firestoreClient.insertPostedStory(
       targetStory,
     );
-    let summary = "";
     try {
-      summary = await getTranslatedSummaryFromUrl(targetStory.url!);
-      await postSummaryOnThread(summary, {
+      const summary = await getTranslatedSummaryFromUrl(targetStory.url!);
+      await replyToPostPerText(summary, {
         cid: result.cid,
         uri: result.uri,
       });

@@ -18,6 +18,9 @@ export class OpenAIClient {
       type: "map_reduce",
     });
     const docs = await this.getWebpageTextDocs(url);
+    if (docs.length === 0 || docs[0].pageContent.length < 30) {
+      return "";
+    }
 
     try {
       const res = await summarizationChain.call({
@@ -41,6 +44,10 @@ export class OpenAIClient {
         waitUntil: "domcontentloaded",
       },
       async evaluate(page) {
+        await page.setViewport({
+          width: 1920,
+          height: 1080,
+        });
         const result = await page.evaluate(async () => {
           // wait page load
           await new Promise((resolve) => setTimeout(resolve, 1000));

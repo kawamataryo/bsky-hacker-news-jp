@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { postNews, postSummaryOnThread } from "../../services/bskyService";
+import { postNews, replyToPostPerText } from "../../services/bskyService";
 import { FirestoreClient } from "../../clients/firestoreClient";
 import { getTargetStory } from "../../services/hackerNewsService";
 import { getTranslatedSummaryFromUrl } from "../../services/openAIService";
@@ -11,7 +11,7 @@ const runtimeOpts = {
 
 export const postTrend = functions
   .runWith(runtimeOpts)
-  .pubsub.schedule("every 1 hours")
+  .pubsub.schedule("every 2 hours")
   .onRun(async () => {
     const targetStory = await getTargetStory();
     const result = await postNews(targetStory);
@@ -20,10 +20,10 @@ export const postTrend = functions
     await firestoreClient.insertPostedStory(
       targetStory,
     );
-    let summary = "";
+
     try {
-      summary = await getTranslatedSummaryFromUrl(targetStory.url!);
-      await postSummaryOnThread(summary, {
+      const summary = await getTranslatedSummaryFromUrl(targetStory.url!);
+      await replyToPostPerText(summary, {
         cid: result.cid,
         uri: result.uri,
       });

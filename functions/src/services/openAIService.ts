@@ -10,9 +10,11 @@ export const getTranslatedSummaryFromUrl = async (url: string): Promise<string> 
   ]);
   if (summary && summary.length > 10) {
     const translatedSummary = await openAIClient.complete(`
-You are a professional translator. Please translate the following English text into Japanese within 300 characters.
+あなたはプロの翻訳者です。以下の英文を自然な日本語に翻訳してください。
+---
 ${summary}
-response:
+---
+結果:
     `.trim());
     return translatedSummary;
   } else {

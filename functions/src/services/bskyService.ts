@@ -129,3 +129,64 @@ export const convertLinkText = (src: string) => {
   }
   return { text: src, facets };
 };
+
+export const splitStringForThreadText = (text: string, limit: number) => {
+  const splitJapaneseText = (jpnText: string) => {
+    // 「。」「、」で分割して配列に格納し、区切り文字を前の要素に含める
+    const items = jpnText.split(/([。、])/);
+
+    const sentences = items.reduce<string[]>((result, item, index) => {
+      if (index % 2 === 0 && index + 1 < items.length) {
+        result.push(item + items[index + 1]);
+      }
+      return result;
+    }, []);
+
+    // 空の要素と区切り文字のみの要素を削除
+    return sentences.filter((sentence: string) =>
+      sentence.trim().length > 0 && sentence !== "。" && sentence !== "、"
+    );
+  };
+
+  const words = splitJapaneseText(text);
+  const chunks = [];
+  let currentChunk = "";
+
+  words.forEach((word) => {
+    if ((currentChunk + word).length <= limit - 5) {
+      currentChunk += word;
+    } else {
+      chunks.push(currentChunk.trim());
+      currentChunk = word;
+    }
+  });
+
+  if (currentChunk) {
+    chunks.push(currentChunk.trim());
+  }
+
+  const total = chunks.length;
+  if (total === 1) return chunks;
+  return chunks.map((chunk, index) => `${chunk} (${index + 1}/${total})`);
+};
+
+export const replyToPostPerText = async (text: string, rootPostRef: ComAtprotoRepoStrongRef.Main) => {
+  const agent = await BskyClient.createAgent({
+    identifier: functions.config().bsky.identifier,
+    password: functions.config().bsky.password,
+  });
+
+  const treadTexts = splitStringForThreadText(`💡 Summary: \n\n${text}`, 300);
+  let targetPostRef = rootPostRef;
+
+  for (const text of treadTexts) {
+    const result = await agent.post({
+      text,
+      reply: {
+        root: rootPostRef,
+        parent: targetPostRef,
+      },
+    });
+    targetPostRef = result;
+  }
+};
