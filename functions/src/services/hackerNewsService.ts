@@ -1,12 +1,11 @@
-import * as functions from "firebase-functions";
 import { FirestoreClient } from "../clients/firestoreClient";
 import { HackerNewsClient } from "../clients/hackerNewsClient";
 import { DeepLClient } from "../clients/deeplClient";
 
-const initializeClients = () => {
+const initializeClients = (secrets: Secrets) => {
   const hackerNewsClient = new HackerNewsClient();
   const fireStoreClient = new FirestoreClient();
-  const deeplClient = new DeepLClient(functions.config().deepl.api_key);
+  const deeplClient = new DeepLClient(secrets.deepl.api_key);
 
   return { hackerNewsClient, fireStoreClient, deeplClient };
 };
@@ -32,8 +31,8 @@ const findValidStory = async (bestStories: number[], fireStoreClient: FirestoreC
   return null;
 };
 
-export const getTargetStory = async (): Promise<HackerNewsItemWithTranslated> => {
-  const { hackerNewsClient, fireStoreClient, deeplClient } = initializeClients();
+export const getTargetStory = async (secrets: Secrets): Promise<HackerNewsItemWithTranslated> => {
+  const { hackerNewsClient, fireStoreClient, deeplClient } = initializeClients(secrets);
   const bestStories = await hackerNewsClient.getBestStories();
   const targetStory = await findValidStory(bestStories, fireStoreClient, hackerNewsClient);
 

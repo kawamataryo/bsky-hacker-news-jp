@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+
 import sharp from "sharp";
 import ogs from "open-graph-scraper";
 import { BskyClient } from "../clients/bskyClient";
@@ -44,10 +44,10 @@ ${item.title}
 `.trim();
 };
 
-export const postNews = async (item: HackerNewsItemWithTranslated) => {
+export const postNews = async (item: HackerNewsItemWithTranslated, secrets: Secrets) => {
   const agent = await BskyClient.createAgent({
-    identifier: functions.config().bsky.identifier,
-    password: functions.config().bsky.password,
+    identifier: secrets.bsky.identifier,
+    password: secrets.bsky.password,
   });
   const { text, facets } = convertLinkText(createPostText(item));
 
@@ -92,10 +92,10 @@ export const postNews = async (item: HackerNewsItemWithTranslated) => {
   }
 };
 
-export const postSummaryOnThread = async (summary: string, postRef: ComAtprotoRepoStrongRef.Main) => {
+export const postSummaryOnThread = async (summary: string, postRef: ComAtprotoRepoStrongRef.Main, secrets: Secrets) => {
   const agent = await BskyClient.createAgent({
-    identifier: functions.config().bsky.identifier,
-    password: functions.config().bsky.password,
+    identifier: secrets.bsky.identifier,
+    password: secrets.bsky.password,
   });
   agent.post({
     text: truncateText(`💡 Summary: \n\n${summary}`, 300),
@@ -170,10 +170,10 @@ export const splitStringForThreadText = (text: string, limit: number) => {
   return chunks.map((chunk, index) => `${chunk} (${index + 1}/${total})`);
 };
 
-export const replyToPostPerText = async (text: string, rootPostRef: ComAtprotoRepoStrongRef.Main) => {
+export const replyToPostPerText = async (text: string, rootPostRef: ComAtprotoRepoStrongRef.Main, secrets: Secrets) => {
   const agent = await BskyClient.createAgent({
-    identifier: functions.config().bsky.identifier,
-    password: functions.config().bsky.password,
+    identifier: secrets.bsky.identifier,
+    password: secrets.bsky.password,
   });
 
   const treadTexts = splitStringForThreadText(`💡 Summary: \n\n${text}`, 300);
