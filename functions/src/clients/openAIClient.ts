@@ -39,7 +39,7 @@ export class OpenAIClient {
       const { text } = await generateText({
         model: this.openai("gpt-5-nano"),
         system:
-          "あなたはプロの要約者です。以下の記事を日本語で1-2文で簡潔に要約してください。200トークン以内に収めてください。",
+          "あなたはプロの要約者です。以下の記事を日本語で1-3文で簡潔に要約してください。",
         prompt: content.slice(0, DOCUMENT_MAX_LENGTH),
         providerOptions: {
           openai: {
