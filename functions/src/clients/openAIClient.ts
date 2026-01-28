@@ -13,6 +13,22 @@ export class OpenAIClient {
     this.openai = createOpenAI({ apiKey: openAIApiKey });
   }
 
+  async translateToJapanese(text: string): Promise<string> {
+    try {
+      const { text: translatedText } = await generateText({
+        model: this.openai("gpt-5-nano"),
+        system:
+          "あなたは優秀な翻訳者です。与えられた英語のテキストを自然な日本語に翻訳してください。翻訳結果のみを出力し、説明や注釈は不要です。",
+        prompt: text,
+      });
+      console.info("🚀 ~ translate result", translatedText);
+      return translatedText.trim();
+    } catch (e) {
+      console.error(e);
+      return text; // 翻訳失敗時は元のテキストを返す
+    }
+  }
+
   async summarize(url: string): Promise<string> {
     const content = await this.getArticleContent(url);
     if (!content || content.length < 30) {

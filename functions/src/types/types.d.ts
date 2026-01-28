@@ -29,9 +29,6 @@ type Secrets = {
     identifier: string;
     password: string;
   };
-  deepl: {
-    api_key: string;
-  };
   openai: {
     api_key: string;
   };

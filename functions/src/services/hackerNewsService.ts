@@ -1,13 +1,13 @@
 import { FirestoreClient } from "../clients/firestoreClient";
 import { HackerNewsClient } from "../clients/hackerNewsClient";
-import { DeepLClient } from "../clients/deeplClient";
+import { OpenAIClient } from "../clients/openAIClient";
 
 const initializeClients = (secrets: Secrets) => {
   const hackerNewsClient = new HackerNewsClient();
   const fireStoreClient = new FirestoreClient();
-  const deeplClient = new DeepLClient(secrets.deepl.api_key);
+  const openAIClient = new OpenAIClient(secrets.openai.api_key);
 
-  return { hackerNewsClient, fireStoreClient, deeplClient };
+  return { hackerNewsClient, fireStoreClient, openAIClient };
 };
 
 const findValidStory = async (bestStories: number[], fireStoreClient: FirestoreClient, hackerNewsClient: HackerNewsClient) => {
@@ -32,17 +32,17 @@ const findValidStory = async (bestStories: number[], fireStoreClient: FirestoreC
 };
 
 export const getTargetStory = async (secrets: Secrets): Promise<HackerNewsItemWithTranslated> => {
-  const { hackerNewsClient, fireStoreClient, deeplClient } = initializeClients(secrets);
+  const { hackerNewsClient, fireStoreClient, openAIClient } = initializeClients(secrets);
   const bestStories = await hackerNewsClient.getBestStories();
   const targetStory = await findValidStory(bestStories, fireStoreClient, hackerNewsClient);
 
   if (!targetStory) {
     throw new Error("No valid story found.");
   }
-  const translatedTitle = await deeplClient.translateJA(targetStory.title);
+  const translatedTitle = await openAIClient.translateToJapanese(targetStory.title);
 
   return {
     ...targetStory,
-    translatedTitle: translatedTitle.trim(),
+    translatedTitle,
   };
 };
